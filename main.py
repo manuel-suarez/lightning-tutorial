@@ -66,6 +66,6 @@ train_loader = DataLoader(train_set)
 autoencoder = LitAutoEncoder(Encoder(), Decoder())
 
 # train model
-trainer = L.Trainer()
-trainer.fit(model=autoencoder, train_dataloaders=train_loader)
+trainer = L.Trainer(devices=2, accelerator="gpu", max_epochs=2)
+trainer.fit(model=autoencoder, train_dataloaders=train_loader, )
 trainer.test(model=autoencoder, dataloaders=DataLoader(test_set))
