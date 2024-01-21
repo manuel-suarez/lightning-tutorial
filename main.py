@@ -3,8 +3,9 @@ import os
 import torch
 from torch import nn
 import torch.nn.functional as F
+import torch.utils.data as data
 from torchvision import transforms
-from torchvision.datasets import MNIST
+from torchvision import datasets
 from torch.utils.data import DataLoader
 import lightning as L
 
@@ -42,13 +43,23 @@ class LitAutoEncoder(L.LightningModule):
         loss = F.mse_loss(x_hat, x)
         return loss
 
+    def test_step(selfself, batch, batch_idx):
+        # this is the test loop
+        x, y = batch
+        x = x.view(x.size(0), -1)
+        z = self.encoder(x)
+        x_hat = self.decoder(z)
+        test_loss = F.mse_loss(x_hat, x)
+        self.log("test_loss", test_loss)
+
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
         return optimizer
 
 # Define Dataset
-dataset = MNIST(os.getcwd(), download=False, transform=transforms.ToTensor())
-train_loader = DataLoader(dataset)
+train_set = datasets.MNIST(os.getcwd(), download=False, train=True, transform=transforms.ToTensor())
+test_set = datasets.MNIST(os.getcwd(), download=True, train=False, transform=transforms.ToTensor())
+train_loader = DataLoader(train_set)
 
 # Train model
 # model
@@ -57,4 +68,4 @@ autoencoder = LitAutoEncoder(Encoder(), Decoder())
 # train model
 trainer = L.Trainer()
 trainer.fit(model=autoencoder, train_dataloaders=train_loader)
-
+trainer.test(model=autoencoder, dataloaders=DataLoader(test_set))
