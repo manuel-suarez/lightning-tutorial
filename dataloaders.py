@@ -16,7 +16,10 @@ valid_set_size = len(train_set) - train_set_size
 seed = torch.Generator().manual_seed(42)
 train_set, valid_set = data.random_split(train_set, [train_set_size, valid_set_size],
                                          generator=seed)
-
-train_loader = DataLoader(train_set, num_workers=23, batch_size="auto")
-valid_loader = DataLoader(valid_set, num_workers=23, batch_size="auto")
-test_loader = DataLoader(test_set, num_workers=23, batch_size="auto")
+train_batch_size = len(train_set) // 4
+valid_batch_size = len(train_set) // 4
+test_batch_size = len(test_set) // 4
+print(train_batch_size, valid_batch_size, test_batch_size)
+train_loader = DataLoader(train_set, num_workers=23, batch_size=train_batch_size)
+valid_loader = DataLoader(valid_set, num_workers=23, batch_size=valid_batch_size)
+test_loader = DataLoader(test_set, num_workers=23, batch_size=test_batch_size)
