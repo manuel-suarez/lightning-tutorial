@@ -17,6 +17,6 @@ seed = torch.Generator().manual_seed(42)
 train_set, valid_set = data.random_split(train_set, [train_set_size, valid_set_size],
                                          generator=seed)
 
-train_loader = DataLoader(train_set, num_workers=23, batch_size=512)
-valid_loader = DataLoader(valid_set, num_workers=23, batch_size=512)
+train_loader = DataLoader(train_set, num_workers=23, batch_size=1000)
+valid_loader = DataLoader(valid_set, num_workers=23, batch_size=1000)
 test_loader = DataLoader(test_set, num_workers=23, batch_size=64)
