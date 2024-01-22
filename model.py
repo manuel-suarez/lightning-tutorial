@@ -33,8 +33,9 @@ class LitAutoEncoder(L.LightningModule):
         x = x.view(x.size(0), -1)
         z = self.encoder(x)
         x_hat = self.decoder(z)
-        loss = F.mse_loss(x_hat, x)
-        return loss
+        train_loss = F.mse_loss(x_hat, x)
+        self.log("train_loss", train_loss, sync_dist=True, prog_bar=True)
+        return train_loss
 
     def test_step(self, batch, batch_idx):
         # this is the test loop
