@@ -8,7 +8,7 @@ import lightning as L
 autoencoder = LitAutoEncoder(Encoder(), Decoder())
 
 # train model
-trainer = L.Trainer(devices=2, accelerator="gpu", max_epochs=5, default_root_dir="training", profiler="simple")
+trainer = L.Trainer(max_epochs=5)
 trainer.fit(autoencoder, train_loader, valid_loader)
 print("Training done!")
 
