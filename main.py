@@ -50,7 +50,16 @@ class LitAutoEncoder(L.LightningModule):
         z = self.encoder(x)
         x_hat = self.decoder(z)
         test_loss = F.mse_loss(x_hat, x)
-        self.log("test_loss", test_loss)
+        self.log("test_loss", test_loss, sync_dist=True)
+
+    def validation_step(self, batch, batch_idx):
+        # this is the validation loop
+        x, y = batch
+        x = x.view(x.size(0), -1)
+        z = self.encoder(x)
+        x_hat = self.decoder(z)
+        val_loss = F.mse_loss(x_hat, x)
+        self.log("val_loss", val_loss)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
@@ -59,13 +68,24 @@ class LitAutoEncoder(L.LightningModule):
 # Define Dataset
 train_set = datasets.MNIST(os.getcwd(), download=False, train=True, transform=transforms.ToTensor())
 test_set = datasets.MNIST(os.getcwd(), download=False, train=False, transform=transforms.ToTensor())
+# use 20% of training data for validation
+train_set_size = int(len(train_set) * 0.8)
+valid_set_size = len(train_set) - train_set_size
+
+# split the train set into two
+seed = torch.Generator().manual_seed(42)
+train_set, valid_set = data.random_split(train_set, [train_set_size, valid_set_size],
+                                         generator=seed)
+
 train_loader = DataLoader(train_set, num_workers=23)
+valid_loader = DataLoader(valid_set, num_workers=23)
+test_loader = DataLoader(test_set, num_workers=23)
 
 # Train model
 # model
 autoencoder = LitAutoEncoder(Encoder(), Decoder())
 
 # train model
-trainer = L.Trainer(devices=2, accelerator="gpu", max_epochs=2)
-trainer.fit(model=autoencoder, train_dataloaders=train_loader, )
-trainer.test(model=autoencoder, dataloaders=DataLoader(test_set))
+trainer = L.Trainer(devices=2, accelerator="gpu", max_epochs=1)
+trainer.fit(autoencoder, train_loader, valid_loader)
+trainer.test(model=autoencoder, dataloaders=test_loader)
