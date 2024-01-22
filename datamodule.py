@@ -12,7 +12,7 @@ class MNISTDataModule(L.LightningDataModule):
         
     def setup(self, stage: str):
         self.mnist_test = datasets.MNIST(self.data_dir, train=False)
-        self.mnist_predict = datasets.MNIS(self.data_dir, train=False)
+        self.mnist_predict = datasets.MNIST(self.data_dir, train=False)
         mnist_full = datasets.MNIST(self.data_dir, train=True)
         train_set_size = int(len(mnist_full) * 0.8)
         valid_set_size = len(mnist_full) - train_set_size
