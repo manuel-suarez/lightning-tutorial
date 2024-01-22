@@ -43,7 +43,7 @@ class LitAutoEncoder(L.LightningModule):
         loss = F.mse_loss(x_hat, x)
         return loss
 
-    def test_step(selfself, batch, batch_idx):
+    def test_step(self, batch, batch_idx):
         # this is the test loop
         x, y = batch
         x = x.view(x.size(0), -1)
@@ -59,7 +59,7 @@ class LitAutoEncoder(L.LightningModule):
 # Define Dataset
 train_set = datasets.MNIST(os.getcwd(), download=False, train=True, transform=transforms.ToTensor())
 test_set = datasets.MNIST(os.getcwd(), download=False, train=False, transform=transforms.ToTensor())
-train_loader = DataLoader(train_set)
+train_loader = DataLoader(train_set, num_workers=23)
 
 # Train model
 # model
