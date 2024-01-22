@@ -4,8 +4,8 @@ import torch
 import torch.utils.data as data
 from torchvision import transforms
 from torchvision import datasets
-from torch.utils.data import Encoder, Decoder, DataLoader
-from model import LitAutoEncoder
+from torch.utils.data import DataLoader
+from model import Encoder, Decoder, LitAutoEncoder
 import lightning as L
 
 # Define Dataset
