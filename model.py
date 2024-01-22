@@ -43,7 +43,7 @@ class LitAutoEncoder(L.LightningModule):
         z = self.encoder(x)
         x_hat = self.decoder(z)
         test_loss = F.mse_loss(x_hat, x)
-        self.log("test_loss", test_loss, sync_dist=True)
+        self.log("test_loss", test_loss, sync_dist=True, prog_bar=True)
 
     def validation_step(self, batch, batch_idx):
         # this is the validation loop
@@ -52,7 +52,7 @@ class LitAutoEncoder(L.LightningModule):
         z = self.encoder(x)
         x_hat = self.decoder(z)
         val_loss = F.mse_loss(x_hat, x)
-        self.log("val_loss", val_loss, sync_dist=True)
+        self.log("val_loss", val_loss, sync_dist=True, prog_bar=True)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
