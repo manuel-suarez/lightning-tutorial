@@ -22,8 +22,10 @@ class MNISTDataModule(L.LightningDataModule):
         # Assign train/val datasets for use in dataloaders
         if stage == "fit":
             mnist_full = MNIST(self.data_dir, train=True, transform=self.transform)
+            train_set_size = int(len(mnist_full) * 0.8)
+            valid_set_size = len(mnist_full) - train_set_size
             self.mnist_train, self.mnist_val = random_split(
-                mnist_full, [55000, 5000], generator=torch.Generator().manual_seed(42)
+                mnist_full, [train_set_size, valid_set_size], generator=torch.Generator().manual_seed(42)
             )
 
         # Assign test dataset for use in dataloader(s)
