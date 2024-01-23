@@ -1,22 +1,17 @@
 #%% Import
-import os
-
 from model import Encoder, Decoder, LitAutoEncoder
-from datamodule import MNISTDataModule
+from dataloaders import train_loader, valid_loader, test_loader
 import lightning as L
 
 # Train model
 # model
-model = LitAutoEncoder(Encoder(), Decoder())
-
-# datamodule
-datamodule = MNISTDataModule(os.getcwd())
+autoencoder = LitAutoEncoder(Encoder(), Decoder())
 
 # train model
 trainer = L.Trainer(max_epochs=5)
-trainer.fit(model, datamodule)
+trainer.fit(autoencoder, train_loader, valid_loader)
 print("Training done!")
 
 # trainer = L.Trainer(devices=1, accelerator="gpu", num_nodes=1)
-trainer.test(model, datamodule)
+trainer.test(model=autoencoder, dataloaders=test_loader)
 print("Testing done!")
