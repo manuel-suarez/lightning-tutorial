@@ -14,9 +14,9 @@ datamodule = MNISTDataModule(os.getcwd())
 
 # train model
 trainer = L.Trainer(max_epochs=5,
-                    accelerator="gpu",
+                    accelerator="auto",
                     devices=2,
-                    num_nodes=1,
+                    num_nodes=2,
                     strategy="ddp")
 trainer.fit(model, datamodule=datamodule)
 
