@@ -13,8 +13,11 @@ model = LitAutoEncoder(Encoder(), Decoder())
 datamodule = MNISTDataModule(os.getcwd())
 
 # train model
-trainer = L.Trainer(max_epochs=5)
+trainer = L.Trainer(max_epochs=5,
+                    accelerator="gpu",
+                    devices=2)
 trainer.fit(model, datamodule=datamodule)
+
 print("Training done!")
 
 # trainer = L.Trainer(devices=1, accelerator="gpu", num_nodes=1)
