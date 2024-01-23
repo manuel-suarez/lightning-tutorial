@@ -34,13 +34,13 @@ class MNISTDataModule(L.LightningDataModule):
             self.mnist_predict = MNIST(self.data_dir, train=False, transform=self.transform)
 
     def train_dataloader(self):
-        return DataLoader(self.mnist_train, batch_size=32)
+        return DataLoader(self.mnist_train, batch_size=32, num_workers=23)
 
     def val_dataloader(self):
-        return DataLoader(self.mnist_val, batch_size=32)
+        return DataLoader(self.mnist_val, batch_size=32, num_workers=23)
 
     def test_dataloader(self):
-        return DataLoader(self.mnist_test, batch_size=32)
+        return DataLoader(self.mnist_test, batch_size=32, num_workers=23)
 
     def predict_dataloader(self):
-        return DataLoader(self.mnist_predict, batch_size=32)
+        return DataLoader(self.mnist_predict, batch_size=32, num_workers=23)
