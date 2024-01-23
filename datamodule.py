@@ -1,48 +1,35 @@
-import lightning as L
 import torch
-from torch.utils.data import random_split, DataLoader
-
-# Note - you must have torchvision installed for this example
-from torchvision.datasets import MNIST
+import lightning as L
+from lightning.pytorch.utilities.types import TRAIN_DATALOADERS, EVAL_DATALOADERS
+from torch.utils import data
 from torchvision import transforms
-
-
+from torchvision import datasets
+from torch.utils.data import DataLoader
 class MNISTDataModule(L.LightningDataModule):
-    def __init__(self, data_dir: str = "./"):
+    def __init__(self, data_dir: str = ".", batch_size: int = 32):
         super().__init__()
         self.data_dir = data_dir
-        self.transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
-
-    def prepare_data(self):
-        # download
-        MNIST(self.data_dir, train=True, download=True)
-        MNIST(self.data_dir, train=False, download=True)
+        self.batch_size = batch_size
 
     def setup(self, stage: str):
-        # Assign train/val datasets for use in dataloaders
-        if stage == "fit":
-            mnist_full = MNIST(self.data_dir, train=True, transform=self.transform)
-            train_set_size = int(len(mnist_full) * 0.8)
-            valid_set_size = len(mnist_full) - train_set_size
-            self.mnist_train, self.mnist_val = random_split(
-                mnist_full, [train_set_size, valid_set_size], generator=torch.Generator().manual_seed(42)
-            )
+        self.mnist_test = datasets.MNIST(self.data_dir, train=False, transform=transforms.ToTensor())
+        self.mnist_predict = datasets.MNIST(self.data_dir, train=False, transform=transforms.ToTensor())
+        mnist_full = datasets.MNIST(self.data_dir, train=True, transform=transforms.ToTensor())
+        train_set_size = int(len(mnist_full) * 0.8)
+        valid_set_size = len(mnist_full) - train_set_size
+        self.mnist_train, self.mnist_val = data.random_split(
+            mnist_full, [train_set_size, valid_set_size],
+            generator=torch.Generator().manual_seed(42)
+        )
 
-        # Assign test dataset for use in dataloader(s)
-        if stage == "test":
-            self.mnist_test = MNIST(self.data_dir, train=False, transform=self.transform)
+    def train_dataloader(self) -> TRAIN_DATALOADERS:
+        return DataLoader(self.mnist_train, batch_size=self.batch_size)
 
-        if stage == "predict":
-            self.mnist_predict = MNIST(self.data_dir, train=False, transform=self.transform)
+    def val_dataloader(self) -> EVAL_DATALOADERS:
+        return DataLoader(self.mnist_val, batch_size=self.batch_size)
 
-    def train_dataloader(self):
-        return DataLoader(self.mnist_train, batch_size=32, num_workers=23)
+    def test_dataloader(self) -> EVAL_DATALOADERS:
+        return DataLoader(self.mnist_test, batch_size=self.batch_size)
 
-    def val_dataloader(self):
-        return DataLoader(self.mnist_val, batch_size=32, num_workers=23)
-
-    def test_dataloader(self):
-        return DataLoader(self.mnist_test, batch_size=32, num_workers=23)
-
-    def predict_dataloader(self):
-        return DataLoader(self.mnist_predict, batch_size=32, num_workers=23)
+    def predict_dataloader(self) -> EVAL_DATALOADERS:
+        return DataLoader(self.mnist_predict, batch_size=self.batch_size)
